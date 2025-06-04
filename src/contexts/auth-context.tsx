@@ -1,76 +1,87 @@
 "use client"
 
-import type React from "react"
-import { createContext, useContext, useState, useEffect } from "react"
-import type { User } from "@/types"
+import { createContext, useContext, useEffect, useState, ReactNode } from "react"
+import { useRouter } from "next/navigation"
+import { API_CONFIG } from "@/config/constants"
+import axios from "axios"
+
+// Creamos un axiosInstance con interceptor global
+const api = axios.create({
+  baseURL: API_CONFIG.baseUrl,
+})
+
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token")
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+})
 
 interface AuthContextType {
-  user: User | null
-  login: (email: string, password: string) => Promise<boolean>
+  user: any
+  token: string | null
+  isLoading: boolean 
+  login: (token: string) => void
   logout: () => void
-  isLoading: boolean
-  isAuthenticated: boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-export function useAuth() {
-  const context = useContext(AuthContext)
-  if (!context) {
-    throw new Error("useAuth debe ser usado dentro de un AuthProvider")
-  }
-  return context
-}
-
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<any>(null)
+  const [token, setToken] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const router = useRouter()
 
   useEffect(() => {
-    // Verificar si hay un usuario guardado en localStorage
-    const savedUser = localStorage.getItem("user")
-    if (savedUser) {
-      setUser(JSON.parse(savedUser))
+    const savedToken = localStorage.getItem("token")
+    if (savedToken) {
+      setToken(savedToken)
+      fetchUser(savedToken)
+    } else {
+      setIsLoading(false)
     }
-    setIsLoading(false)
   }, [])
 
-  const login = async (email: string, password: string): Promise<boolean> => {
-    setIsLoading(true)
-
-    // Simulación de autenticación
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-
-    if (email === "admin@escuela.com" && password === "admin123") {
-      const userData: User = {
-        id: "1",
-        email,
-        name: "Administrador",
-        role: "admin",
+  const fetchUser = async (token: string) => {
+    try {
+      const res = await api.get("/usuarios/me")
+      setUser(res.data)
+    } catch (error: any) {
+      console.error("Error al obtener el usuario", error)
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        logout()
       }
-
-      setUser(userData)
-      localStorage.setItem("user", JSON.stringify(userData))
+    } finally {
       setIsLoading(false)
-      return true
     }
+  }
 
-    setIsLoading(false)
-    return false
+  const login = async (newToken: string) => {
+    localStorage.setItem("token", newToken)
+    setToken(newToken)
+    await fetchUser(newToken)
   }
 
   const logout = () => {
+    localStorage.removeItem("token")
+    setToken(null)
     setUser(null)
-    localStorage.removeItem("user")
+    router.push("/")
   }
 
-  const value = {
-    user,
-    login,
-    logout,
-    isLoading,
-    isAuthenticated: !!user,
-  }
+  return (
+    <AuthContext.Provider value={{ user, token, isLoading, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  )
+}
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+export const useAuth = () => {
+  const context = useContext(AuthContext)
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider")
+  }
+  return context
 }

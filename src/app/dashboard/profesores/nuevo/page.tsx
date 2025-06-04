@@ -1,58 +1,104 @@
 "use client"
 
-import type React from "react"
-
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
-import { ROUTES } from "@/config/constants"
+import { API_CONFIG, ROUTES } from "@/config/constants"
+import { useAuth } from "@/contexts/auth-context"
 
 export default function NuevoProfesor() {
   const [formData, setFormData] = useState({
-    name: "",
+    nombre: "",
+    apellido: "",
     email: "",
-    subject: "",
-    department: "",
-    experience: "",
-    phone: "",
+    password: "",
+    especialidad: "",
+    nivel_academico: "",
+    telefono: "",
+    carnet_identidad: ""
   })
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
+  const { token } = useAuth()
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value })
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
-    // Simulación de guardado
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    try {
+      // Crear usuario primero
+      const usuarioResponse = await fetch(`${API_CONFIG.baseUrl}/usuarios`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          nombre: formData.nombre,
+          apellido: formData.apellido,
+          email: formData.email,
+          password: formData.password,
+          rol: "profesor"  // Establecer el rol correctamente
+        })
+      })
 
-    toast({
-      title: "Profesor registrado",
-      description: `${formData.name} ha sido registrado exitosamente`,
-    })
+      if (!usuarioResponse.ok) {
+        throw new Error("Error al crear usuario")
+      }
 
-    setIsLoading(false)
-    router.push(ROUTES.TEACHERS.LIST)
-  }
+      const usuarioData = await usuarioResponse.json()
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    })
+      // Crear profesor con usuario_id
+      const profesorResponse = await fetch(`${API_CONFIG.baseUrl}/profesores`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          usuario_id: usuarioData.id,
+          telefono: formData.telefono,
+          carnet_identidad: formData.carnet_identidad,
+          especialidad: formData.especialidad,
+          nivel_academico: formData.nivel_academico
+        })
+      })
+
+      if (!profesorResponse.ok) {
+        throw new Error("Error al crear profesor")
+      }
+
+      toast({
+        title: "Profesor registrado",
+        description: `${formData.nombre} ${formData.apellido} ha sido registrado exitosamente`,
+      })
+
+      router.push(ROUTES.TEACHERS.LIST)
+    } catch (error) {
+      console.error("Error:", error)
+      toast({
+        title: "Error",
+        description: "Ocurrió un error al registrar el profesor",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-blue-800">Nuevo Profesor</h1>
-        <p className="text-gray-600">Registra un nuevo miembro del personal docente</p>
-      </div>
+      <h1 className="text-3xl font-bold text-blue-800">Nuevo Profesor</h1>
+      <p className="text-gray-600">Registra un nuevo miembro del personal docente</p>
 
       <Card className="border-blue-100 max-w-2xl">
         <CardHeader>
@@ -61,77 +107,14 @@ export default function NuevoProfesor() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Nombre Completo *</Label>
-                <Input
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="Dr. Juan Pérez"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Correo Electrónico *</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="juan.perez@escuela.com"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="subject">Materia Principal *</Label>
-                <Input
-                  id="subject"
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleChange}
-                  placeholder="Matemáticas"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="department">Departamento *</Label>
-                <Input
-                  id="department"
-                  name="department"
-                  value={formData.department}
-                  onChange={handleChange}
-                  placeholder="Ciencias Exactas"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="experience">Años de Experiencia</Label>
-                <Input
-                  id="experience"
-                  name="experience"
-                  value={formData.experience}
-                  onChange={handleChange}
-                  placeholder="10 años"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="phone">Teléfono</Label>
-                <Input
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  placeholder="+52 555 123 4567"
-                />
-              </div>
+              <Input name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Nombre *" required />
+              <Input name="apellido" value={formData.apellido} onChange={handleChange} placeholder="Apellido *" required />
+              <Input name="email" type="email" value={formData.email} onChange={handleChange} placeholder="Correo *" required />
+              <Input name="password" type="password" value={formData.password} onChange={handleChange} placeholder="Contraseña *" required />
+              <Input name="especialidad" value={formData.especialidad} onChange={handleChange} placeholder="Especialidad *" required />
+              <Input name="nivel_academico" value={formData.nivel_academico} onChange={handleChange} placeholder="Nivel Académico *" required />
+              <Input name="telefono" value={formData.telefono} onChange={handleChange} placeholder="Teléfono" />
+              <Input name="carnet_identidad" value={formData.carnet_identidad} onChange={handleChange} placeholder="Carnet Identidad" />
             </div>
 
             <div className="flex gap-4 pt-4">

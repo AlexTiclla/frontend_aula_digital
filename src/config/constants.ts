@@ -6,7 +6,8 @@ export const APP_CONFIG = {
 } as const
 
 export const API_CONFIG = {
-  baseUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api",
+  baseUrl: process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1",
+  baseUrl2: process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000",
   timeout: 10000,
 } as const
 
@@ -16,6 +17,7 @@ export const ROUTES = {
   STUDENTS: {
     LIST: "/dashboard/estudiantes/lista",
     NEW: "/dashboard/estudiantes/nuevo",
+    EDIT: "/dashboard/estudiantes/editar",
     ATTENDANCE: "/dashboard/estudiantes/asistencias",
     INACTIVE: "/dashboard/estudiantes/inactivos",
   },
@@ -23,7 +25,13 @@ export const ROUTES = {
     LIST: "/dashboard/profesores/lista",
     NEW: "/dashboard/profesores/nuevo",
     SCHEDULES: "/dashboard/profesores/horarios",
+    EDIT: "/dashboard/profesores/editar",
     EVALUATIONS: "/dashboard/profesores/evaluaciones",
+  },
+   SUBJECTS: {
+    LIST: "/dashboard/materias/lista",
+    NEW: "/dashboard/materias/nuevo",
+    EDIT: "/dashboard/materias/editar",
   },
   COURSES: {
     LIST: "/dashboard/cursos/lista",
@@ -42,6 +50,34 @@ export const ROUTES = {
     NOTIFICATIONS: "/dashboard/configuracion/notificaciones",
   },
 } as const
+
+// Niveles educativos para materias
+export const EDUCATION_LEVELS = [
+  "PreKinder",
+  "Kinder",
+  "1ro Primara",
+  "2do Primaria",
+  "3ro Primaria",
+  "4to Primaria",
+  "5to Primaria",
+  "6to Primaria",
+  "1ro Secundaria",
+  "2do Secundaria",
+  "3ro Secundaria",
+  "4to Secundaria",
+  "5to Secundaria",
+  "6to Secundaria",
+] as const
+
+// Niveles educativos para materias
+export const TUTOR_RELATIONSHIPS = [
+  "Padre",
+  "Madre",
+  "Apoderado",
+  "Tio",
+  "Tia",
+
+] as const
 
 export const DEMO_CREDENTIALS = {
   email: "admin@escuela.com",

@@ -67,6 +67,11 @@ const menuItems: MenuItem[] = [
         href: ROUTES.STUDENTS.NEW,
         icon: UserPlus,
       },
+       {
+        title: "Editar Estudiante",
+        href: ROUTES.STUDENTS.EDIT,
+        icon: List,
+      },
       {
         title: "Asistencias",
         href: ROUTES.STUDENTS.ATTENDANCE,
@@ -130,6 +135,28 @@ const menuItems: MenuItem[] = [
         title: "Calificaciones",
         href: ROUTES.COURSES.GRADES,
         icon: Award,
+      },
+    ],
+  },
+  {
+    title: "Materias",
+    href: ROUTES.SUBJECTS.LIST,
+    icon: BookOpen,
+    subItems: [
+      {
+        title: "Lista de Materias",
+        href: ROUTES.SUBJECTS.LIST,
+        icon: List,
+      },
+      {
+        title: "Nueva Materia",
+        href: ROUTES.SUBJECTS.NEW,
+        icon: PlusCircle,
+      },
+       {
+        title: "Editar Materia",
+        href: ROUTES.SUBJECTS.EDIT,
+        icon: PlusCircle,
       },
     ],
   },

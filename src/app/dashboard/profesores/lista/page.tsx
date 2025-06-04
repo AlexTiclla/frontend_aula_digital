@@ -1,17 +1,61 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Search, Plus, Filter, Mail } from "lucide-react"
-import { useTeachers } from "@/hooks/use-dashboard-data"
+import { API_CONFIG, ROUTES } from "@/config/constants"
+import { useAuth } from "@/contexts/auth-context"
+import { useRouter } from "next/navigation"
+
+// Nuevo tipo basado en el backend
+type Usuario = {
+  id: number
+  nombre: string
+  apellido: string
+  email: string
+  rol: string
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+type Profesor = {
+  id: number
+  usuario: Usuario
+  telefono: string
+  carnet_identidad: string
+  especialidad: string
+  nivel_academico: string
+}
 
 export default function ListaProfesores() {
-  const { teachers, isLoading } = useTeachers()
+  const [teachers, setTeachers] = useState<Profesor[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const { token } = useAuth()
+  const router = useRouter()
+  useEffect(() => {
+    const fetchTeachers = async () => {
+      try {
+        const response = await fetch(`${API_CONFIG.baseUrl}/profesores`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        if (!response.ok) throw new Error("Error al obtener profesores")
+        const data = await response.json()
+        setTeachers(data)
+      } catch (error) {
+        console.error("Error:", error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
 
-  if (isLoading) {
-    return <div className="p-6">Cargando profesores...</div>
-  }
+    if (token) fetchTeachers()
+    else setIsLoading(false)
+  }, [token])
+
+  if (isLoading) return <div className="p-6">Cargando profesores...</div>
 
   return (
     <div className="space-y-6">
@@ -49,44 +93,36 @@ export default function ListaProfesores() {
                 <tr className="border-b bg-blue-50">
                   <th className="text-left p-4 font-medium">Nombre</th>
                   <th className="text-left p-4 font-medium">Email</th>
-                  <th className="text-left p-4 font-medium">Materia</th>
-                  <th className="text-left p-4 font-medium">Departamento</th>
-                  <th className="text-left p-4 font-medium">Experiencia</th>
+                  <th className="text-left p-4 font-medium">Especialidad</th>
+                  <th className="text-left p-4 font-medium">Nivel Académico</th>
+                  <th className="text-left p-4 font-medium">Teléfono</th>
                   <th className="text-left p-4 font-medium">Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {teachers.map((profesor) => (
                   <tr key={profesor.id} className="border-b hover:bg-gray-50">
-                    <td className="p-4">
-                      <div className="font-medium text-gray-900">{profesor.name}</div>
+                    <td className="p-4 font-medium text-gray-900">
+                      {profesor.usuario.nombre} {profesor.usuario.apellido}
                     </td>
-                    <td className="p-4">
-                      <div className="text-sm text-gray-600 flex items-center truncate max-w-[200px]">
-                        <Mail className="h-3 w-3 mr-1 flex-shrink-0" />
-                        <span className="truncate">{profesor.email}</span>
-                      </div>
+                    <td className="p-4 text-sm text-gray-600 truncate max-w-[200px] flex items-center">
+                      <Mail className="h-3 w-3 mr-1" /> {profesor.usuario.email}
                     </td>
-                    <td className="p-4">
-                      <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs whitespace-nowrap">
-                        {profesor.subject}
-                      </span>
+                    <td className="p-4 px-2 py-1 text-blue-60 rounded-full text-xs whitespace-nowrap">
+                      {profesor.especialidad}
                     </td>
-                    <td className="p-4">
-                      <div className="text-sm text-gray-600 truncate max-w-[150px]">{profesor.department}</div>
+                    <td className="p-4 text-sm text-gray-600">
+                      {profesor.nivel_academico}
                     </td>
-                    <td className="p-4">
-                      <div className="text-sm whitespace-nowrap">{profesor.experience}</div>
+                    <td className="p-4 text-sm">
+                      {profesor.telefono}
                     </td>
-                    <td className="p-4">
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm" className="whitespace-nowrap">
-                          Ver Detalles
-                        </Button>
-                        <Button variant="outline" size="sm" className="whitespace-nowrap">
-                          Horarios
-                        </Button>
-                      </div>
+                    <td className="p-4 flex gap-2">
+                      <Button variant="outline" size="sm" onClick={() => router.push(`${ROUTES.TEACHERS.EDIT}/${profesor.id}`)}>
+                        Editar
+                      </Button>
+                      <Button variant="outline" size="sm">Ver Detalles</Button>
+                      <Button variant="outline" size="sm">Horarios</Button>
                     </td>
                   </tr>
                 ))}

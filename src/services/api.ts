@@ -10,23 +10,14 @@ class ApiService {
   }
 
   // Métodos de autenticación
-  async login(email: string, password: string): Promise<{ user: User; token: string }> {
-    // Simulación de llamada a API
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    if (email === "admin@escuela.com" && password === "admin123") {
-      return {
-        user: {
-          id: "1",
-          email,
-          name: "Administrador",
-          role: "admin",
-        },
-        token: "fake-jwt-token",
-      }
-    }
-
-    throw new Error("Credenciales inválidas")
+  async login(email: string, password: string): Promise<{ token: string }> {
+    const res = await fetch(`${this.baseUrl}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    if (!res.ok) throw new Error("Credenciales inválidas");
+    return await res.json();
   }
 
   // Métodos para estudiantes
