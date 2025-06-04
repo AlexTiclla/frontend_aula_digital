@@ -6,8 +6,8 @@ export const APP_CONFIG = {
 } as const
 
 export const API_CONFIG = {
-  baseUrl: process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1",
-  baseUrl2: process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000",
+  baseUrl: process.env.NEXT_PUBLIC_API_BASE_V1 || "http://127.0.0.1:8000/api/v1",
+  baseUrl2: process.env.NEXT_PUBLIC_API_BASE_RAW || "http://127.0.0.1:8000",
   timeout: 10000,
 } as const
 
