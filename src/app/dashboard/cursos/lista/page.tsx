@@ -152,6 +152,7 @@ export default function ListaCursosPeriodo() {
                       <div className="flex items-center text-sm">
                         <Clock className="h-4 w-4 mr-1 text-gray-500" />
                         <span>Aula: {curso.aula}</span>
+                        <span className="ml-2">{curso.id} </span>
                       </div>
 
                       <div className="pt-2 flex gap-2">

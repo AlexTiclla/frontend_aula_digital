@@ -1,3 +1,5 @@
+import { Assistant, Graduate } from "next/font/google"
+
 // Configuraciones y constantes del proyecto
 export const APP_CONFIG = {
   name: "Colegio San Agustín",
@@ -38,6 +40,11 @@ export const ROUTES = {
     NEW: "/dashboard/cursos/nuevo",
     MATERIALS: "/dashboard/cursos/materiales",
     GRADES: "/dashboard/cursos/calificaciones",
+  },
+  GRADES:{
+    GRADE: "/dashboard/notas/notas",
+    ASISTENCIA : "/dashboard/notas/asistencias",
+    PARTICIPACIONES: "/dashboard/notas/participaciones",
   },
   CALENDAR: {
     MONTHLY: "/dashboard/calendario/mensual",

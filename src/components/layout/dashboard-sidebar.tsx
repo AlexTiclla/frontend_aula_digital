@@ -160,6 +160,28 @@ const menuItems: MenuItem[] = [
       },
     ],
   },
+   {
+    title: "Notas",
+    href: ROUTES.GRADES.GRADE, // Assuming this is the main route for grades
+    icon: BookOpen,
+    subItems: [
+      {
+        title: "Nueva Nota",
+        href: ROUTES.GRADES.GRADE,
+        icon: List,
+      },
+      {
+        title: "Nueva Asistencia",
+        href: ROUTES.GRADES.ASISTENCIA,
+        icon: PlusCircle,
+      },
+       {
+        title: "Nueva Participación",
+        href: ROUTES. GRADES.PARTICIPACIONES,
+        icon: PlusCircle,
+      },
+    ],
+  },
   {
     title: "Calendario",
     href: ROUTES.CALENDAR.MONTHLY,

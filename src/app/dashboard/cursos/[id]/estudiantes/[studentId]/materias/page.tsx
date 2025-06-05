@@ -42,7 +42,7 @@ export default function MateriasEstudiantePage() {
     const fetchMaterias = async () => {
       try {
         const token = localStorage.getItem("token")
-        const res = await fetch(`${API_CONFIG.baseUrl}/estudiantes/${studentId}/materias`, {
+        const res = await fetch(`${API_CONFIG.baseUrl}/estudiantes/estudiantes/${studentId}/materias2`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         const data = await res.json()

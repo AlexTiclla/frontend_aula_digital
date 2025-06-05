@@ -35,8 +35,6 @@ interface Estudiante {
     id: number
     direccion: string
     fecha_nacimiento: string
-    curso_periodo_id: number
-    curso_periodo_nombre: string
     usuario: Usuario
     tutor: Tutor
 }
@@ -44,28 +42,32 @@ interface Estudiante {
 export default function EstudiantesCurso() {
     const [searchTerm, setSearchTerm] = useState("")
     const [estudiantes, setEstudiantes] = useState<Estudiante[]>([])
-    const [cursoNombre, setCursoNombre] = useState<string>("")
     const router = useRouter()
     const params = useParams()
-    const cursoPeriodoId = Number(params.id)
+    const cursoMateriaId = Number(params.id)
 
     useEffect(() => {
         const fetchEstudiantes = async () => {
             try {
                 const token = localStorage.getItem("token")
-                const res = await fetch(`${API_CONFIG.baseUrl}/curso_periodos/${cursoPeriodoId}/estudiantes`, {
+                const res = await fetch(`${API_CONFIG.baseUrl}/curso_periodos/curso_periodo/${cursoMateriaId}/estudiantes`, {
                     headers: { Authorization: `Bearer ${token}` },
                 })
                 const data: Estudiante[] = await res.json()
-                setEstudiantes(data)
-                if (data.length > 0) setCursoNombre(data[0].curso_periodo_nombre)
+
+                if (Array.isArray(data)) {
+                    setEstudiantes(data)
+                } else {
+                    console.warn("Respuesta inesperada del backend:", data)
+                    setEstudiantes([])
+                }
             } catch (error) {
                 console.error("Error al cargar estudiantes:", error)
             }
         }
 
         fetchEstudiantes()
-    }, [cursoPeriodoId])
+    }, [cursoMateriaId])
 
     const filteredStudents = estudiantes.filter(
         (student) =>
@@ -78,10 +80,6 @@ export default function EstudiantesCurso() {
         router.push(ROUTES.COURSES.LIST)
     }
 
-    function handleViewSubjects(id: number): void {
-        throw new Error("Function not implemented.")
-    }
-
     return (
         <div className="space-y-6">
             <div className="flex items-center gap-4">
@@ -89,8 +87,7 @@ export default function EstudiantesCurso() {
                     <ArrowLeft className="h-4 w-4" />
                 </Button>
                 <div>
-                    <h1 className="text-3xl font-bold text-blue-800">Estudiantes del Curso</h1>
-                    <p className="text-gray-600">{cursoNombre}</p>
+                    <h1 className="text-3xl font-bold text-blue-800">Estudiantes Inscritos en la Materia</h1>
                 </div>
             </div>
 
@@ -118,7 +115,7 @@ export default function EstudiantesCurso() {
                 <CardContent>
                     {filteredStudents.length === 0 ? (
                         <div className="text-center py-8">
-                            <p className="text-gray-500">No se encontraron estudiantes en este curso.</p>
+                            <p className="text-gray-500">No se encontraron estudiantes inscritos.</p>
                         </div>
                     ) : (
                         <div className="space-y-4">
@@ -144,20 +141,17 @@ export default function EstudiantesCurso() {
                                                         <span>{student.usuario.email}</span>
                                                     </div>
                                                 </div>
-                                                {/* Botón Ver Materias */}
                                                 <div className="mt-4">
                                                     <Button
                                                         variant="outline"
                                                         size="sm"
                                                         className="w-full"
-                                                        onClick={() => router.push(`/dashboard/cursos/${cursoPeriodoId}/estudiantes/${student.id}/materias`)}
+                                                        onClick={() => router.push(`/dashboard/cursos/${cursoMateriaId}/estudiantes/${student.id}/materias`)}
                                                     >
                                                         <BookOpen className="h-4 w-4 mr-2" />
                                                         Ver Materias
                                                     </Button>
                                                 </div>
-
-
                                             </div>
                                             <div className="border-l pl-6">
                                                 <h4 className="font-medium text-gray-900 mb-3">Información del Tutor</h4>
