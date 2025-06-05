@@ -110,7 +110,7 @@ export default function AsistenciaPage() {
         const token = localStorage.getItem("token") // ✅ Obtener token guardado
 
         for (const [estudianteId, valor] of Object.entries(asistencia)) {
-            await fetch(`${API_CONFIG.baseUrl2}/asistencias`, {
+            await fetch(`${API_CONFIG.baseUrl}/asistencias`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

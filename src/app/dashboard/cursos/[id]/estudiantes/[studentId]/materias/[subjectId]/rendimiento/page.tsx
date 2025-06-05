@@ -69,10 +69,10 @@ export default function RendimientoAcademico() {
           axios.get(`${API_CONFIG.baseUrl}/notas/estudiante/${studentId}/materia/${subjectId}/detalles`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get(`${API_CONFIG.baseUrl2}/asistencias/estudiante/${studentId}/materia/${subjectId}/asistencias`, {
+          axios.get(`${API_CONFIG.baseUrl}/asistencias/estudiante/${studentId}/materia/${subjectId}/asistencias`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get(`${API_CONFIG.baseUrl2}/participaciones/estudiante/${studentId}/materia/${subjectId}/participaciones`, {
+          axios.get(`${API_CONFIG.baseUrl}/participaciones/estudiante/${studentId}/materia/${subjectId}/participaciones`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ])

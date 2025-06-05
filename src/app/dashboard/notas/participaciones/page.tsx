@@ -101,7 +101,7 @@ export default function ParticipacionPage() {
         for (const [estudianteId, valor] of Object.entries(participaciones)) {
             if (!["Baja", "Media", "Alta"].includes(valor)) continue // ✅ Validación de valor permitido
 
-            await fetch(`${API_CONFIG.baseUrl2}/participaciones`, {
+            await fetch(`${API_CONFIG.baseUrl}/participaciones`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
